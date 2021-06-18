@@ -8,11 +8,13 @@ Created on Fri Jun 11 07:50:59 2021
 # import pandas as pd
 import nltk 
 import re
+from symspellpy import SymSpell, Verbosity
+from itertools import islice
 
 ex_punctuation = "@#$^&*;<>|" #used for removing these punctuations
 numbers = "0123456789"
 path = "//home/black/Documents/project/amh.txt"
-dctpath = "/home/black/Documents/project/test.txt"
+dctpath = "/home/black/Documents/project/dictionary.txt"
 dictionary = open(dctpath
 ,'r',encoding='utf-8').read()
     
@@ -126,18 +128,36 @@ def split_merged_words(word,line):
                 
         
 
+def spell_correction(file):
+    inputs = file.read()
+    inputs = inputs.split()
+    line = dictionary.split()
+    print(len(line))
+    templist=[]
+    spellcheck = SymSpell(max_dictionary_edit_distance=2,prefix_length=7)
+    spellcheck.load_dictionary(dctpath,term_index=0,count_index=1)
+    print(list(islice(spellcheck.words.items(),5)))
+
+    for word in inputs: 
+       
+        if word in line:  
+
+            templist.append(word)
+        else:      
+            print(word)
+   
+            suggest = spellcheck.lookup(word,verbosity=2,max_edit_distance=2)
+            templist.append(suggest[0]._term)
+            
+    print(' '.join(templist))
         
-                  
-
-                        
-
 
 
 
     
 if __name__ == '__main__':
     file= file_read('r')
-    find_merged_words(file)
+    spell_correction(file)
     
     
     
